@@ -1,0 +1,61 @@
+# Kubernetes API version
+apiVersion: apps/v1
+# Deployment object
+kind: Deployment
+metadata:
+  # The name of the Deployment
+  name: postgresdb
+  namespace: nestjs-template
+  labels:
+    app: postgresdb
+spec:
+  # Replicas for this Deployment
+  replicas: 1
+  selector:
+    # labels the pods
+    matchLabels:
+      app: postgresdb
+  template:
+    metadata:
+      labels:
+        # The label the pods created from the pod template should have
+        app: postgresdb
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-configmap
+              key: POSTGRES_HOST
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-configmap
+              key: POSTGRES_DB
+        volumeMounts:
+          # The volume mounts  for the container
+          - mountPath: /var/lib/postgres/data
+            name: postgredb
+      # Volumes attached to the pod
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            # reference the PersistentVolumeClaim
+            claimName: postgres-persistent-volume-claim
+

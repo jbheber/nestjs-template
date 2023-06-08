@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nestjs-template-service
+  namespace: nestjs-template
+spec:
+  selector:
+    app: nestjs-template
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 3000
